@@ -96,7 +96,7 @@ Pour remédier à cela il faudrait permettre en option de spécifier le nom du
 champ pour éviter des conflits tout en restant mappé sur le même champ de la 
 table.
 
-__Exemple__:
++Exemple+:
 
 <pre>
 <p>
