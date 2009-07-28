@@ -1,11 +1,9 @@
-h1. Présentation
+h1. Filters
 
 L'objectif de la bibliothèque filters est de faciliter le filtrage d'une 
 collection d'objets ActiveRecord.
 
 L'adaptation à d'autres ORM ne devrait pas être bien compliquée.
-
-h1. Exemples
 
 h2. Côté vue
 
@@ -43,8 +41,6 @@ end
 
 C'est tout.
 
-h1. Avancé
-
 h2. Associations
 
 Filters permet aussi de filtrer sur des associations.
@@ -58,9 +54,7 @@ Par exemple pour chercher les factures d'un client:
 </pre>
 
 Le type rl désigne un right like, c'est à dire que l'on aura du SQL du genre:
-<pre>
-company.name LIKE "foo%"
-</pre>
+<pre>company.name LIKE "foo%"</pre>
 
 La liste des types comprend:
 * eq => equal, 
@@ -72,6 +66,7 @@ La liste des types comprend:
 * lt => lower than, 
 * ge => greater or equal than, 
 * le => lower or equal than
+
 L'option par défaut est eq.
 
 L'option use_blank permet de spécifier si l'on doit quand même utiliser le 
@@ -92,7 +87,7 @@ permet de repasser toutes les options d'un find classique.
 end
 </pre>
 
-h1. Limitations
+h2. Limitations
 
 Pour le moment Filters ne permet pas de définir des intervalles. 
 La raison de cette limitation tient au fait que les noms des champs 
@@ -120,17 +115,14 @@ association ne mappe pas directement le nom d'un modèle cela ne fonctionnera
 pas.
 
 Par exemple le modèle bill peut avoir un 
-<pre>
-belongs_to :sender
-</pre> 
+<pre>belongs_to :sender</pre> 
 et un 
-<pre>
-belongs_to :receiver
-</pre>
+<pre>belongs_to :receiver</pre>
 où sender et receiver sont des instances du modèle Company.
 
 Il faudrait donc dans la même idée une option permettant de spécifier le nom du 
 modèle:
+
 <pre>
 <p>
 	<%= label_tag "receiver_name", "Client" %>: 
