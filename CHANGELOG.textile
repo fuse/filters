@@ -1,0 +1,12 @@
+2009-07-29
+
+- Filters permet maintenant de filtrer des intervalles en référencant le même 
+champ depuis plusieurs filtres. 
+- Il est aussi possible de filtrer sur les associations.
+- La génération du code SQL pour les associations a été simplifiée en 
+utilisant le nom de table et de modèle directement depuis la reflection.
+- Création de ce changelog
+
+2009-07-28
+
+- Premier import

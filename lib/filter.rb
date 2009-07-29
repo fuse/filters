@@ -35,14 +35,17 @@ module Filter
       if fields.any?
         fields_filters  = filters[model_name] || {}
         for field in fields.keys
-          if self.column_names.include?(field)
+          # Check if the field reference an other. Exemple: we want all object whose 
+          # created_at field is > 01/01/09 and < 01/31/09. We have to use two fields
+          # with different names, referencing the same table's field.
+          related_field = (fields_filters[field] || {})["reference"] || field
+          if self.column_names.include?(related_field)
             value           = fields[field]             
-            field_filters   = default.merge(fields_filters[field] || {}).symbolize_keys
-            
+            field_filters   = default.merge(fields_filters[field] || {}).symbolize_keys            
             if not value.blank? or field_filters[:use_blank]
               filter = field_filters[:type].to_sym
               if TYPES.keys.include?(filter)
-                conditions << "`#{field}` #{TYPES[filter]} ?"
+                conditions << "`#{self.table_name}`.`#{related_field}` #{TYPES[filter]} ?"
                 case filter
                   when :li then values << "%#{value}%"
                   when :ll then values << "%#{value}"
@@ -52,38 +55,38 @@ module Filter
               end
             end
           end          
-        end  # for
+        end
         filters.delete(model_name)
         args.delete(model_name)
       end
       
       options[:joins] ||= []
-      for reflection_name in self.reflections.keys.map(&:to_s)
-        # some params of this reflection has been sent
+      for reflection_key in self.reflections.keys
+        reflection_name = reflection_key.to_s        
         reflection_fields = args[reflection_name]
-        if reflection_fields.is_a?(Hash)          
-          model = reflection_name.singularize.camelcase.constantize rescue nil
-          if model
-            reflection_filters = filters[reflection_name] || {}
-            for field in reflection_fields.keys
-              field_filters = default.merge(reflection_filters[field] || {}).symbolize_keys
-              value = reflection_fields[field]
-              if model.column_names.include?(field) and (not value.blank? or field_filters[:use_blank])
-                type_filter = field_filters[:type].to_sym
-                if TYPES.keys.include?(type_filter)
-                  conditions << "`#{reflection_name.pluralize}`.`#{field}` #{TYPES[type_filter]} ?"
-                  case type_filter
-                    when :li then values << "%#{value}%"
-                    when :ll then values << "%#{value}"
-                    when :rl then values << "#{value}%"
-                    else  values << value
-                  end
-                  # load association unless already loaded
-                  options[:joins] << reflection_name.to_sym  unless options[:joins].include?(reflection_name)
+        # some params of this reflection has been sent
+        if reflection_fields.is_a?(Hash)
+          reflection = self.reflections[reflection_key]
+          reflection_filters = filters[reflection_name] || {}
+          
+          for field in reflection_fields.keys
+            field_filters = default.merge(reflection_filters[field] || {}).symbolize_keys
+            value = reflection_fields[field]
+            if reflection.klass.column_names.include?(field) and (not value.blank? or field_filters[:use_blank])
+              type_filter = field_filters[:type].to_sym
+              if TYPES.keys.include?(type_filter)
+                conditions << "`#{reflection.table_name}`.`#{field}` #{TYPES[type_filter]} ?"
+                case type_filter
+                  when :li then values << "%#{value}%"
+                  when :ll then values << "%#{value}"
+                  when :rl then values << "#{value}%"
+                  else  values << value
                 end
+                # load association unless already loaded
+                options[:joins] << reflection_key  unless options[:joins].include?(reflection_key)
               end
             end
-          end
+          end          
         end        
       end
 
@@ -99,8 +102,8 @@ module Filter
       define_method "filter_#{type}" do |klass, field, *args|
         options       = args.shift || {}
         html_options  = args.shift || {}
-        name, value = field_name_and_value(klass, field)
-        method_name = "#{type}_tag"
+        name, value   = field_name_and_value(klass, field)
+        method_name   = "#{type}_tag"
         [self.send(method_name, name, value, html_options)] + filter_options(klass, field, options)        
       end
     end

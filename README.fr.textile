@@ -72,6 +72,34 @@ L'option par défaut est eq.
 L'option use_blank permet de spécifier si l'on doit quand même utiliser le 
 filtre quand il est vide. Par défaut use_blank est à false.
 
+Si le nom de l'association est customer et qu'il mappe une table companies 
+cela fonctionnera quand même.
+
+C'est le nom de l'association qui doit être utilisé dans la vue mais c'est 
+bien le nom de la table qui sera utilisée dans le filtre.
+
+h2. Intervalles
+
+Il est possible de définir des intervalles de recherche de valeurs.
+
+<pre>
+<p>
+	<%= label_tag "bill_created_at_after", "Créée entre le:" %>: 
+	<%= filter_text_field :bill, :created_at_after, { :type => :ge, :reference => :created_at }  %>
+</p>
+
+<p>
+	<%= label_tag "bill_created_at_before", "et le:" %>: 
+	<%= filter_text_field :bill, :created_at_before, { :type => :le, :reference => :created_at } %>
+</p>
+</pre>
+
+Il est par contre impératif que le nom des champs utilisés ne soit pas le même, 
+sous peine de comportement «étrange».
+
+L'option reference permet de définir sur quel champ la recherche va s'appliquer.
+Rien n'empêche donc de faire plusieurs filtres sur un même champ.
+
 h2. Filters fonctionne t-il avec will_paginate ?
 
 Oui. Seule l'invocation côté controller change. De façon plus générale filter 
@@ -87,45 +115,18 @@ permet de repasser toutes les options d'un find classique.
 end
 </pre>
 
-h2. Limitations
+h2. Sécurité
 
-Pour le moment Filters ne permet pas de définir des intervalles. 
-La raison de cette limitation tient au fait que les noms des champs 
-dans les vues sont mappés sur ceux de la table.
-Pour remédier à cela il faudrait permettre en option de spécifier le nom du 
-champ pour éviter des conflits tout en restant mappé sur le même champ de la 
-table.
+Il est important de savoir ce que vous faites lorsque vous utilisez filters.
+En effet potentiellement rien n'empêche un utilisateur de modifier les 
+paramètres envoyés pour filtrer les résultats (même pour un formulaire de 
+type POST).
 
-+Exemple+:
+Des paramètres pourraient donc être envoyés pour filtrer des champs que 
+vous n'aviez pas prévu.
 
-<pre>
-<p>
-	<%= label_tag "bill_created_at_after", "Créée entre le:" %>: 
-	<%= filter_text_field :bill, :created_at, { :type => :ge, :name => "bill_created_at_after" }  %>
-</p>
+De même il suffit de modifier le paramètre référence pour changer le 
+comportement d'un filtre et le faire filtrer un autre champ.
 
-<p>
-	<%= label_tag "bill_created_at_before", "et le:" %>: 
-	<%= filter_text_field :bill, :created_at, { :type => :le, :name => "bill_created_at_before" } %>
-</p>
-</pre>
-
-Un problème du même type existe pour les associations. Si le nom d'une 
-association ne mappe pas directement le nom d'un modèle cela ne fonctionnera 
-pas.
-
-Par exemple le modèle bill peut avoir un 
-<pre>belongs_to :sender</pre> 
-et un 
-<pre>belongs_to :receiver</pre>
-où sender et receiver sont des instances du modèle Company.
-
-Il faudrait donc dans la même idée une option permettant de spécifier le nom du 
-modèle:
-
-<pre>
-<p>
-	<%= label_tag "receiver_name", "Client" %>: 
-	<%= filter_text_field :receiver, :name, { :type => :rl, :association_name => "Company" }  %>
-</p>
-</pre>
+Pour palier à cela les prochaines versions permettront de définir 
+explicitement quels champs ne peuvent pas être filtrés.
