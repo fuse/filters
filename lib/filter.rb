@@ -104,7 +104,12 @@ module Filter
         html_options  = args.shift || {}
         name, value   = field_name_and_value(klass, field)
         method_name   = "#{type}_tag"
-        [self.send(method_name, name, value, html_options)] + filter_options(klass, field, options)        
+
+				if :check_box == type
+					[self.send(method_name, name, value, !value.blank?, { :value => "1" }.merge(html_options))] + filter_options(klass, field, options)
+				else
+					[self.send(method_name, name, value, html_options)] + filter_options(klass, field, options)
+				end
       end
     end
     
