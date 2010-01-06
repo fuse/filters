@@ -126,7 +126,7 @@ module Filter
       name, value = field_name_and_value(klass, field)
       # Convert to an integer if it is (id)
       value = value =~ /^\d+$/ ? value.to_i : value
-      [select_tag(name, options_for_select(options[:values] || [], value))] + filter_options(klass, field, options)
+      [select_tag(name, options_for_select(options[:values] || [], value), html_options)] + filter_options(klass, field, options)
     end
 
     private    
