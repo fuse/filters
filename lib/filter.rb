@@ -12,6 +12,8 @@ module Filter
       :le => '<='
     }.freeze
 
+    ALL = ':*'
+
     def filter(args = {}, options = {})
       self.find(:all, options.merge(:conditions => build_conditions(args, options)))
     end
@@ -42,7 +44,9 @@ module Filter
           if self.column_names.include?(related_field)
             value           = fields[field]
             field_filters   = default.merge(fields_filters[field] || {}).symbolize_keys
-            if not value.blank? or field_filters[:use_blank]
+            # Skip filter if the value is blank and we don't care about blank or if we use
+            # blank and the value match the special ALL value.
+            unless (!field_filters[:use_blank] and value.blank?) or (field_filters[:use_blank] and ALL == value)
               filter = field_filters[:type].to_sym
               if TYPES.keys.include?(filter)
                 conditions << "`#{self.table_name}`.`#{related_field}` #{TYPES[filter]} ?"
@@ -105,15 +109,15 @@ module Filter
         name, value   = field_name_and_value(klass, field)
         method_name   = "#{type}_tag"
 
-    if :check_box == type
-      [self.send(method_name, name, value, !value.blank?, { :value => "1" }.merge(html_options))] + filter_options(klass, field, options)
-    elsif :radio_button == type
-      original_value = options[:value]
-      raise ArgumentError, "You shoud set a value to the radio button." unless original_value
-      self.send(method_name, name, original_value, value == original_value, html_options)
-    else
-      [self.send(method_name, name, value, html_options)] + filter_options(klass, field, options)
-    end
+        if :check_box == type
+          [self.send(method_name, name, value, !value.blank?, { :value => "1" }.merge(html_options))] + filter_options(klass, field, options)
+        elsif :radio_button == type
+          original_value = options[:value]
+          raise ArgumentError, "You shoud set a value to the radio button." unless original_value
+          self.send(method_name, name, original_value, value == original_value, html_options)
+        else
+          [self.send(method_name, name, value, html_options)] + filter_options(klass, field, options)
+        end
       end
     end
 
