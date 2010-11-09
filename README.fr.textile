@@ -1,7 +1,6 @@
 h1. Filters
 
-L'objectif de la bibliothèque filters est de faciliter le filtrage d'une
-collection d'objets ActiveRecord.
+L'objectif de la bibliothèque filters est de faciliter le filtrage d'une collection d'objets ActiveRecord.
 
 L'adaptation à d'autres ORM ne devrait pas être bien compliquée.
 
@@ -69,34 +68,29 @@ La liste des types comprend:
 
 L'option par défaut est eq.
 
-L'option use_blank permet de spécifier si l'on doit quand même utiliser le
-filtre quand il est vide. Par défaut use_blank est à false.
+L'option use_blank permet de spécifier si l'on doit quand même utiliser le filtre quand il est vide. Par défaut use_blank est à false.
 
-Si le nom de l'association est customer et qu'il mappe une table companies
-cela fonctionnera quand même.
+Si le nom de l'association est customer et qu'il mappe une table companies cela fonctionnera quand même.
 
-C'est le nom de l'association qui doit être utilisé dans la vue mais c'est
-bien le nom de la table qui sera utilisée dans le filtre.
+C'est le nom de l'association qui doit être utilisé dans la vue mais c'est bien le nom de la table qui sera utilisée dans le filtre.
 
 h2. Valeur vide
 
-Par défaut une valeur vide ne créera simplement pas de filtre, elle est donc
-généralement utilisée pour récupérer tous les résultats. Si vous souhaitez
-utilisez la valeur vide en tant que telle dans le filtre il faudra utiliser
-l'option use_blank, et la mettre à true.
+Par défaut une valeur vide ne créera simplement pas de filtre, elle est donc généralement utilisée pour récupérer tous les résultats.
+Si vous souhaitez utilisez la valeur vide en tant que telle dans le filtre il faudra utiliser l'option use_blank, et la mettre à true.
 
 h3. Combiner valeur vide et tous
 
-Comme mentionné au dessus, utiliser use_blank empêche de récupérer l'
-intégralité des résultats.
+Comme mentionné au dessus, utiliser use_blank empêche de récupérer l'intégralité des résultats.
 
-Pour avoir une option dans un select qui propose de sélectionner tous les
-résultats quand use_blank est à true il faut spécifier la valeur à :*
+Pour avoir une option dans un select qui propose de sélectionner tous les résultats quand use_blank est à true il faut spécifier la valeur à :* (Filter::Model::ALL)
 
+<pre>
 <p>
   <%= label_tag "bill_state", "Etat" %>
   <%= filter_select(:bill, :state, { :values => [["Tous", ":*"], ["Vide", ""]], :use_blank => true }) %>
 </p>
+</pre>
 
 h2. Intervalles
 
@@ -114,16 +108,13 @@ Il est possible de définir des intervalles de recherche de valeurs.
 </p>
 </pre>
 
-Il est par contre impératif que le nom des champs utilisés ne soit pas le même,
-sous peine de comportement «étrange».
+Il est par contre impératif que le nom des champs utilisés ne soit pas le même, sous peine de comportement «étrange».
 
-L'option reference permet de définir sur quel champ la recherche va s'appliquer.
-Rien n'empêche donc de faire plusieurs filtres sur un même champ.
+L'option reference permet de définir sur quel champ la recherche va s'appliquer. Rien n'empêche donc de faire plusieurs filtres sur un même champ.
 
 h2. Filters fonctionne t-il avec will_paginate ?
 
-Oui. Seule l'invocation côté controller change. De façon plus générale filter
-permet de repasser toutes les options d'un find classique.
+Oui. Seule l'invocation côté controller change. De façon plus générale filter permet de repasser toutes les options d'un find classique.
 
 <pre>
 @bills = WillPaginate::Collection.create(params[:page] || 1, 10) do |pager|
@@ -138,15 +129,10 @@ end
 h2. Sécurité
 
 Il est important de savoir ce que vous faites lorsque vous utilisez filters.
-En effet potentiellement rien n'empêche un utilisateur de modifier les
-paramètres envoyés pour filtrer les résultats (même pour un formulaire de
-type POST).
+En effet potentiellement rien n'empêche un utilisateur de modifier les paramètres envoyés pour filtrer les résultats (même pour un formulaire de type POST).
 
-Des paramètres pourraient donc être envoyés pour filtrer des champs que
-vous n'aviez pas prévu.
+Des paramètres pourraient donc être envoyés pour filtrer des champs que vous n'aviez pas prévu.
 
-De même il suffit de modifier le paramètre référence pour changer le
-comportement d'un filtre et le faire filtrer un autre champ.
+De même il suffit de modifier le paramètre référence pour changer le comportement d'un filtre et le faire filtrer un autre champ.
 
-Pour palier à cela les prochaines versions permettront de définir
-explicitement quels champs ne peuvent pas être filtrés.
+Pour palier à cela les prochaines versions permettront de définir explicitement quels champs ne peuvent pas être filtrés.
